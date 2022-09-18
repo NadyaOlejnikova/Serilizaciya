@@ -1,5 +1,6 @@
 import java.io.*;
-public class Basket {
+public class Basket implements Serializable{
+
     protected static  int[] prices = {10,20,30}; //цены
     protected static  String[] products = {"Сахар", "Соль", "Помидоры"}; //товары
     protected int[] quantityOfGoods; //количество
@@ -13,6 +14,8 @@ public class Basket {
         this.products = products;
         quantityOfGoods = new int[products.length];
     }
+
+
 
     //метод вывода на экран покупательской корзины
     protected void printCart() {
@@ -79,7 +82,30 @@ public class Basket {
                 saveTxt.print(product + " ");
             }
         }
-        System.out.println("Данные сохранены в файл basket.txt");
+        System.out.println("Данные сохранены в файл ");
+    }
+    //сериализация:
+    public static void saveBin()  {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("basket.bin"))) {
+            Basket basket = new Basket(prices, products);
+            out.writeObject(basket);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //десериализация:
+    protected static void loadFromBinFile() {
+        try (ObjectInputStream deSerialObj = new ObjectInputStream(new FileInputStream("basket.bin"))) {
+            Basket basket = (Basket) deSerialObj.readObject();
+            System.out.println(basket);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
+
+

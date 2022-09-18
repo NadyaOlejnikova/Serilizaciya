@@ -1,14 +1,16 @@
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Scanner;
+
+
 
 public class Main {
     public static void main(String[] args) throws IOException {
+
         Scanner scanner = new Scanner(System.in);
         int[] prices = {10,20,30};
        String[] products = {"Сахар", "Соль", "Помидоры"};
         Basket basket = new Basket(prices, products);
-        File file = new File("basket.txt");
+        File file = new File("basket.bin");
         if (file.exists()) {
             System.out.println("Восстановление корзины.....");
             Basket.loadFromTxtFile(file);
@@ -32,9 +34,13 @@ public class Main {
             }
             basket.printCart();
             basket.saveTxt(file);
+            Basket.saveBin();
+            Basket.loadFromBinFile();
         }
     }
+
 }
+
 
 
 

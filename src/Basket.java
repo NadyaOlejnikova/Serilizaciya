@@ -1,8 +1,9 @@
 import java.io.*;
-public class Basket implements Serializable{
 
-    protected static  int[] prices = {10,20,30}; //цены
-    protected static  String[] products = {"Сахар", "Соль", "Помидоры"}; //товары
+public class Basket implements Serializable {
+
+    protected static int[] prices = {10, 20, 30}; //цены
+    protected static String[] products = {"Сахар", "Соль", "Помидоры"}; //товары
     protected int[] quantityOfGoods; //количество
     protected int sumTotal = 0;
     protected int productPieces = 0;
@@ -16,21 +17,20 @@ public class Basket implements Serializable{
     }
 
 
-
     //метод вывода на экран покупательской корзины
     protected void printCart() {
 
-            System.out.println("Ваша корзина:");
-            for (int i = 0; i < quantityOfGoods.length; i++) {
-                if (quantityOfGoods[i] != 0) {
-                    quantityOfGoods[i] += sumProducts;
-                    productPieces = quantityOfGoods[i];
-                    sumAll = productPieces * prices[i];
-                    sumTotal += sumAll;
-                    System.out.println(products[i] + " " + productPieces + " шт " + prices[i] + " руб/шт " + sumAll + "  руб в сумме.");
-                }
-
+        System.out.println("Ваша корзина:");
+        for (int i = 0; i < quantityOfGoods.length; i++) {
+            if (quantityOfGoods[i] != 0) {
+                quantityOfGoods[i] += sumProducts;
+                productPieces = quantityOfGoods[i];
+                sumAll = productPieces * prices[i];
+                sumTotal += sumAll;
+                System.out.println(products[i] + " " + productPieces + " шт " + prices[i] + " руб/шт " + sumAll + "  руб в сумме.");
             }
+
+        }
         System.out.println("Итого: " + sumTotal + " руб.");
     }
 
@@ -38,6 +38,7 @@ public class Basket implements Serializable{
     protected void addToCart(int productNum, int quantity) {
         quantityOfGoods[productNum] += quantity;
     }
+
     protected static Basket loadFromTxtFile(File file) {
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 
@@ -84,8 +85,9 @@ public class Basket implements Serializable{
         }
         System.out.println("Данные сохранены в файл ");
     }
+
     //сериализация:
-    public static void saveBin()  {
+    public static void saveBin() {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("basket.bin"))) {
             Basket basket = new Basket(prices, products);
             out.writeObject(basket);

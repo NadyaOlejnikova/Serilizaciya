@@ -5,8 +5,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);
-        int[] prices = {10,20,30};
-       String[] products = {"Сахар", "Соль", "Помидоры"};
+        int[] prices = {10, 20, 30};
+        String[] products = {"Сахар", "Соль", "Помидоры"};
         Basket basket = new Basket(prices, products);
         File file = new File("basket.txt");
         if (file.exists()) {
@@ -25,9 +25,9 @@ public class Main {
                     break;
                 }
                 String[] parts = input.split(" ");
-                int productNumber  = Integer.parseInt(parts[0]) - 1;
-                int productCount  = Integer.parseInt(parts[1]);
-                basket.addToCart(productNumber, productCount );// вызываем метод добавления товара в корзину
+                int productNumber = Integer.parseInt(parts[0]) - 1;
+                int productCount = Integer.parseInt(parts[1]);
+                basket.addToCart(productNumber, productCount);// вызываем метод добавления товара в корзину
 
             }
             basket.printCart();

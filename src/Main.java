@@ -26,52 +26,52 @@ public class Main {
         //File file = new File("basket.txt");
         File file = new File("basket.json");
 
-            if (file.exists()) {
-                System.out.println("Восстановление корзины.....");
-                JSONParser parser = new JSONParser();
-                Object obj = parser.parse(new FileReader("basket.json"));
-                JSONObject jsonObject = (JSONObject) obj;
-                JSONArray jsonArray = (JSONArray) jsonObject.get("num");
-                for (Object num : jsonArray) {
-                    System.out.println(num);
+        if (file.exists()) {
+            System.out.println("Восстановление корзины.....");
+            JSONParser parser = new JSONParser();
+            Object obj = parser.parse(new FileReader("basket.json"));
+            JSONObject jsonObject = (JSONObject) obj;
+            JSONArray jsonArray = (JSONArray) jsonObject.get("num");
+            for (Object num : jsonArray) {
+                System.out.println(num);
+            }
+        } else {
+            System.out.println("Файл с данными не найден, заполните корзину.");
+            System.out.println("Список товаров:  ");
+            for (int i = 0; i < products.length; i++) {
+                System.out.println((i + 1) + "  " + products[i] + "  " + prices[i] + " руб.");
+            }
+            while (true) {
+                System.out.println("Введите номер товара и его количество или для выхода наберите end.");
+                String input = scanner.nextLine();
+                if ("end".equals(input)) {
+                    break;
                 }
-            } else {
-                System.out.println("Файл с данными не найден, заполните корзину.");
-                System.out.println("Список товаров:  ");
-                for (int i = 0; i < products.length; i++) {
-                    System.out.println((i + 1) + "  " + products[i] + "  " + prices[i] + " руб.");
+                String[] parts = input.split(" ");
+                int productNumber = Integer.parseInt(parts[0]) - 1;
+                int productCount = Integer.parseInt(parts[1]);
+                basket.addToCart(productNumber, productCount);// вызываем метод добавления товара в корзину
+                clientLog.log(productNumber + 1, productCount);
+
+
+                JSONObject object = new JSONObject();
+                object.put("num", productCount);
+                object.put("count", productNumber + 1);
+                try (FileWriter file1 = new FileWriter("basket.json", true)) {
+                    object.write(file1);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                while (true) {
-                    System.out.println("Введите номер товара и его количество или для выхода наберите end.");
-                    String input = scanner.nextLine();
-                    if ("end".equals(input)) {
-                        break;
-                    }
-                    String[] parts = input.split(" ");
-                    int productNumber = Integer.parseInt(parts[0]) - 1;
-                    int productCount = Integer.parseInt(parts[1]);
-                    basket.addToCart(productNumber, productCount);// вызываем метод добавления товара в корзину
-                    clientLog.log(productNumber + 1, productCount);
-
-
-                    JSONObject object = new JSONObject();
-                    object.put("num", productCount);
-                    object.put("count", productNumber + 1);
-                    try (FileWriter file1 = new FileWriter("basket.json", true)) {
-                        object.write(file1);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-                basket.printCart();
-                // basket.saveTxt(file);
-
-                clientLog.exportAsCSV("log.csv");
 
             }
+            basket.printCart();
+            // basket.saveTxt(file);
+
+            clientLog.exportAsCSV("log.csv");
+
         }
     }
+}
 
 
 

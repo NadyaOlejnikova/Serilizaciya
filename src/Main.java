@@ -1,40 +1,46 @@
-
-import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
 public class Main {
-    //Также вместо вызова метода saveTxt в методе main сериализуйте корзину в
-    // json-формате в файл basket.json. Аналогично при старте программы загружайте
-    // корзину десериализацией из json-а из файла basket.json,
-    // а не из обычной текстовой сериализации как было до того.
-    // При этом логику сериализации в методах в классе корзины трогать не нужно.
-    public static void main(String[] args) throws IOException, ParseException {
+
+    public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
         Scanner scanner = new Scanner(System.in);
-        int[] prices = {10, 20, 30};
+        int[] prices = {70, 30, 115};
+
         String[] products = {"Сахар", "Соль", "Помидоры"};
         Basket basket = new Basket(prices, products);
 
         ClientLog clientLog = new ClientLog();
         //File file = new File("basket.txt");
         File file = new File("basket.json");
-
-        if (file.exists()) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document doc = builder.parse(new File("shop.xml"));
+        XPath xPath = XPathFactory.newInstance().newXPath();
+        boolean loadEnable = Boolean.parseBoolean(xPath
+                .compile("/config/load/enabled")
+                .evaluate(doc));
+        if (loadEnable && file.exists()) {
+            XPath xPath1 = XPathFactory.newInstance().newXPath();
+            String loadFileName = xPath1
+                    .compile("/config/load/fileName")
+                    .evaluate(doc);
+            System.out.println("файл " + loadFileName);
             System.out.println("Восстановление корзины.....");
-            JSONParser parser = new JSONParser();
-            Object obj = parser.parse(new FileReader("basket.json"));
-            JSONObject jsonObject = (JSONObject) obj;
-            JSONArray jsonArray = (JSONArray) jsonObject.get("num");
-            for (Object num : jsonArray) {
-                System.out.println(num);
-            }
+            //Basket.loadFromTxtFile(file);
+            Basket.loadJson(file);
         } else {
             System.out.println("Файл с данными не найден, заполните корзину.");
             System.out.println("Список товаров:  ");
@@ -47,28 +53,42 @@ public class Main {
                 if ("end".equals(input)) {
                     break;
                 }
-                String[] parts = input.split(" ");
-                int productNumber = Integer.parseInt(parts[0]) - 1;
-                int productCount = Integer.parseInt(parts[1]);
-                basket.addToCart(productNumber, productCount);// вызываем метод добавления товара в корзину
-                clientLog.log(productNumber + 1, productCount);
-
-
-                JSONObject object = new JSONObject();
-                object.put("num", productCount);
-                object.put("count", productNumber + 1);
-                try (FileWriter file1 = new FileWriter("basket.json", true)) {
-                    object.write(file1);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                XPath xPath2 = XPathFactory.newInstance().newXPath();
+                boolean saveEnabled = Boolean.parseBoolean(xPath
+                        .compile("/config/save/enabled")
+                        .evaluate(doc));
+                if (input != null && !input.equals("end")) {
+                    XPath xPath1 = XPathFactory.newInstance().newXPath();
+                    String saveFileName = xPath2
+                            .compile("/config/save/fileName")
+                            .evaluate(doc);
+                    System.out.println("сохранено в " + saveFileName);
+                    String[] parts = input.split(" ");
+                    int productNumber = Integer.parseInt(parts[0]) - 1;
+                    int productCount = Integer.parseInt(parts[1]);
+                    basket.addToCart(productNumber, productCount);// вызываем метод добавления товара в корзину
+                    clientLog.log(productNumber + 1, productCount);
+                    JSONObject obj = new JSONObject();
+                    obj.accumulate("Number", productNumber + 1);
+                    obj.accumulate("Count", productCount);
+                    System.out.println(obj);
+                    try (FileWriter reader = new FileWriter("basket.json", true)) {
+                        reader.write(obj.toString());
+                    }
                 }
+                basket.printCart();
+                // basket.saveTxt(file);
+                XPath xPath3 = XPathFactory.newInstance().newXPath();
+                boolean logEnabled = Boolean.parseBoolean(xPath
+                        .compile("/config/log/enabled")
+                        .evaluate(doc));
+                String logFileName = xPath3
+                        .compile("/config/log/fileName")
+                        .evaluate(doc);
+                System.out.println("сохранено в " + logFileName);
+                clientLog.exportAsCSV("log.csv");
 
             }
-            basket.printCart();
-            // basket.saveTxt(file);
-
-            clientLog.exportAsCSV("log.csv");
-
         }
     }
 }

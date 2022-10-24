@@ -6,9 +6,9 @@ import java.io.FileWriter;
 import au.com.bytecode.opencsv.CSVWriter;
 
 public class ClientLog {
-    List<String[]> log = new ArrayList<>();
-    CSVWriter writer;
-    String[] string = "productNum quantity".split(" ");
+    protected List<String[]> log = new ArrayList<>();
+    protected CSVWriter writer;
+    protected String[] string = "productNum quantity".split(" ");
 
 
     // покупатель добавил покупку, то это действие должно быть сохранено.

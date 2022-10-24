@@ -1,15 +1,15 @@
 
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.google.gson.Gson;
+
 
 import java.io.*;
+import java.util.Scanner;
 
-public class Basket {
-    protected static int[] prices = {10, 20, 30}; //цены
-    protected static String[] products = {"Сахар", "Соль", "Помидоры"}; //товары
+
+public class Basket implements Serializable {
+    protected static int[] prices; //цены
+    protected static String[] products; //товары
     protected int[] quantityOfGoods; //количество
     protected int sumTotal = 0;
     protected int productPieces = 0;
@@ -44,7 +44,7 @@ public class Basket {
         quantityOfGoods[productNum] += quantity;
     }
 
-    protected static Basket loadFromTxtFile(File file) {
+    public static Basket loadFromTxtFile(File file) {
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 
             String[] readCount = br.readLine().split(" ");
@@ -89,6 +89,22 @@ public class Basket {
             }
         }
         System.out.println("Данные сохранены в файл basket.txt");
+    }
+
+    public void saveJson(File jsonFile) throws FileNotFoundException {
+        try (PrintWriter out = new PrintWriter(jsonFile)) {
+            Gson gson = new Gson();
+            String json = gson.toJson(this);
+            out.println(json);
+        }
+    }
+
+    public static Basket loadJson(File jsonFile) throws IOException {
+        try (Scanner scanner = new Scanner(jsonFile)) {
+            String json = scanner.nextLine();
+            Gson gson = new Gson();
+            return gson.fromJson(json, Basket.class);
+        }
     }
 
 
